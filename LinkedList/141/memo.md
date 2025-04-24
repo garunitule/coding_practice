@@ -113,6 +113,8 @@ class Solution:
 
 ## レビュー後の対応
 下記コメントの対応
+https://github.com/garunitule/coding_practice/pull/1#discussion_r2056303790
+
 https://github.com/garunitule/coding_practice/pull/1#discussion_r2057824132
 
 ```python
