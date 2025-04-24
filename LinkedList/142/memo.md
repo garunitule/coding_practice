@@ -55,6 +55,11 @@ class Solution:
 https://github.com/shintaro1993/arai60/pull/5/files
 実装についてじゃないが、setの挙動について詳しく調査していただいている。
 
+https://github.com/python/cpython/blob/1fb7e2aeb7e4312b7f20f0d5f39ddd00d7762004/Objects/setobject.c#L13C4-L20C25
+概要の説明はここに書いてあった。open addressingで、線形なプロービングと乱数を使ったプロービングを組み合わせている。
+実装箇所の一例として、set_lookkeyがある
+https://github.com/python/cpython/blob/1fb7e2aeb7e4312b7f20f0d5f39ddd00d7762004/Objects/setobject.c#L78
+
 https://github.com/oshibusu/leetcode-arai60/pull/3/files#diff-3f9c32204f87045957945540758e10433c163d26cdb83f858c1743dd36e22292
 これもfast, slowで解けるのか。
 fast, slowは循環の検出はできるが、循環の最初のNodeの検出は出来ないと思っていた。
