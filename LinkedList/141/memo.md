@@ -110,3 +110,26 @@ class Solution:
         
         return False
 ```
+
+## レビュー後の対応
+下記コメントの対応
+https://github.com/garunitule/coding_practice/pull/1#discussion_r2057824132
+
+```python
+class Solution:
+    def hasCycle(self, head: Optional[ListNode]) -> bool:
+        if head is None:
+            return False
+
+        slow = head
+        fast = head.next
+
+        while slow is not fast:
+            if fast is None or fast.next is None:
+                return False
+            
+            slow = slow.next
+            fast = fast.next.next
+        
+        return True
+```
