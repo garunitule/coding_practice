@@ -129,3 +129,30 @@ class Solution:
         
         return not stack
 ```
+
+## レビューコメントを反映したコード
+```python
+class Solution:
+    def isValid(self, s: str) -> bool:
+        stack = []
+        open_to_close = {
+            "(": ")",
+            "[": "]",
+            "{": "}"
+        }
+
+        for c in s:
+            if c in open_to_close:
+                stack.append(c)
+                continue
+            
+            if not stack:
+                return False
+            
+            last_open_bracket = stack.pop()
+            expected_close_bracket = open_to_close[last_open_bracket]
+            if c != expected_close_bracket:
+                return False
+        
+        return not stack
+```
