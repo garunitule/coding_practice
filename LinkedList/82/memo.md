@@ -176,7 +176,7 @@ class Solution:
 ```
 
 ちなみに変数はtailを使っているがどうなんだろう。step1で書いたpred（predecessor）はちょっとわかりづらいとは思うが、tailかというと違和感がある。
-prev（previous）がいいかな。より際立たせるならnodeやheadじゃなくてcurr（current）を使うとよさそう。
+prev（previous）がいいかな。対応関係をちゃんと示すならnodeやheadじゃなくてcurr（current）を使うとよさそう。
 
 今までの考えを総合すると下記。
 ```python
@@ -247,4 +247,57 @@ class Solution:
         else:
             head.next = self.deleteDuplicates(head.next)
             return head
+```
+
+## レビューコメントを踏まえた修正
+修正点1
+prevをunique_tailに、currentをscanに変更した。
+理由は、それぞれ下記の役割だと考えたため。
+- unique_tail: 重複していない値で構成されたListNodeの末尾を示すため
+- scan: 全体を走査するためのノード
+
+修正点2
+PEP8に則ってListNodeの引数前後のスペースを削除した
+
+```python
+class Solution:
+    def deleteDuplicates(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        sentinel = ListNode(next=head)
+        unique_tail = sentinel
+        scan = head
+
+        while scan is not None and scan.next is not None:
+            if scan.val != scan.next.val:
+                unique_tail = unique_tail.next
+                scan = scan.next
+                continue
+            
+            val = scan.val
+            while scan is not None and scan.val == val:
+                scan = scan.next
+            unique_tail.next = scan
+        
+        return sentinel.next
+
+```
+
+再帰の実装で早期returnしてみた。
+早期returnを使うシーンは、then節とelse節の処理量や主要度合いに差がある時だと思っている。
+今回の場合だと、まずhead is None or head.next is Noneの場合は明らかに軽いので早期return使った方が良い。
+次に head.val != head.next.valの場合だけど、こちらも重複削除の場合に比べたら軽い。一番主眼にやりたいことは「重複削除」なので。
+
+```python
+class Solution:
+    def deleteDuplicates(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        if head is None or head.next is None:
+            return head
+        
+        if head.val != head.next.val:
+            head.next = self.deleteDuplicates(head.next)
+            return head
+        
+        val = head.val
+        while head is not None and head.val == val:
+            head = head.next
+        return self.deleteDuplicates(head)
 ```
