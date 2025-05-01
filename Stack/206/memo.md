@@ -172,3 +172,28 @@ class Solution:
         node.next = None
         return last_node
 ```
+
+## レビューコメントを反映した実装
+修正点
+- last_relinked, relinking, next_relinking という変数名に修正した
+- 
+
+```python
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+class Solution:
+    def reverseList(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        relinking = head
+        last_relinked = None
+
+        while relinking is not None:
+            next_relinking = relinking.next
+            relinking.next = last_relinked
+            last_relinked = relinking
+            relinking = next_relinking
+        
+        return last_relinked
+```
