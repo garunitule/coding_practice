@@ -223,3 +223,36 @@ class KthLargest:
 # obj = KthLargest(k, nums)
 # param_1 = obj.add(val)
 ```
+
+## レビューコメントを反映したコード
+対応内容
+- __init__でヒープを作る際にaddを利用する
+  - 理由：nlargestとソートを使った方法だと、一瞬ヒープかどうか迷わせてしまう。それよりは分かりやすい方法を選択した方が良いと判断した。
+  - heapifyしてpopする方法もあったけど、addで作る方がより素直だと思いaddで作る方法を選択した。
+
+```python
+import heapq
+class KthLargest:
+
+    def __init__(self, k: int, nums: List[int]):
+        self.k = k
+        self.top_k_min_heap = []
+        for num in nums:
+            self.add(num)
+
+    def add(self, val: int) -> int:
+        if len(self.top_k_min_heap) < self.k:
+            heapq.heappush(self.top_k_min_heap, val)
+            return self.top_k_min_heap[0]
+        
+        if val <= self.top_k_min_heap[0]:
+            return self.top_k_min_heap[0]
+        
+        heapq.heappushpop(self.top_k_min_heap, val)
+        return self.top_k_min_heap[0]
+
+
+# Your KthLargest object will be instantiated and called as such:
+# obj = KthLargest(k, nums)
+# param_1 = obj.add(val)
+```
