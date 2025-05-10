@@ -336,5 +336,46 @@ class KthLargest:
 いただいたレビューコメント
 https://github.com/garunitule/coding_practice/pull/8/files#r2072361948
 
+内部実装は読んでいないが、APIの仕様書を見ると大まかな時間計算量は分かる
+https://grantjenks.com/docs/sortedcontainers/sortedlist.html#sortedcontainers.SortedList.index
+
 #### 実装
-TODO
+SortedListを使ったシンプルな実装
+
+```python
+from sortedcontainers import SortedList
+
+class KthLargest:
+
+    def __init__(self, k: int, nums: List[int]):
+        self.k = k
+        self.sorted_nums = SortedList(nums)
+
+    def add(self, val: int) -> int:
+        self.sorted_nums.add(val)
+        return self.sorted_nums[len(self.sorted_nums) - self.k]
+```
+
+k個だけ保持するように改良する
+
+```python
+from sortedcontainers import SortedList
+
+class KthLargest:
+
+    def __init__(self, k: int, nums: List[int]):
+        self.k = k
+        self.top_k_sorted_vals = SortedList(nums).isslice()
+        while self.k < len(self.top_k_sorted_vals):
+            self.top_k_sorted_vals.pop(0)
+
+    def add(self, val: int) -> int:
+        self.top_k_sorted_vals.add(val)
+        if len(self.top_k_sorted_vals) > self.k:
+            self.top_k_sorted_vals.pop(0)
+        return self.top_k_sorted_vals[0]
+
+# Your KthLargest object will be instantiated and called as such:
+# obj = KthLargest(k, nums)
+# param_1 = obj.add(val)
+```
