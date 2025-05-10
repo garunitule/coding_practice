@@ -96,3 +96,140 @@ class Solution:
         freq = Counter(nums)
         return [num for num, _ in freq.most_common(k)]
 ```
+
+## レビューコメントを踏まえた実装
+https://github.com/tokuhirat/LeetCode/pull/9#discussion_r2073704526
+quickselectで実装してみる。
+1, 2, ..., k番目に大きい数を取得すると、
+時間計算量はO(kn)だけかかりそう。
+
+もっと早くできないかな。
+いやquickselectした時点でソートはされてないけど、分割はできてるから一回のquickselectで済むのでO(n)でできるのか。
+問題の制約でも any order と言ってるので大丈夫そう。
+
+実装できた。
+```python
+from collections import Counter
+import random
+
+class Solution:
+    def topKFrequent(self, nums: List[int], k: int) -> List[int]:
+        count_to_num = [(count, num) for num, count in Counter(nums).items()]
+    
+        def _quick_select(left: int, right: int, k_smallest_index: int):
+            if left == right:
+                return count_to_num[left]
+            
+            while left < right:
+                pivot_index = random.randint(left, right)
+                pivot_index = _partition(left, right, pivot_index)
+                if pivot_index == k_smallest_index:
+                    break
+                elif pivot_index < k_smallest_index:
+                    left = pivot_index + 1
+                else:
+                    right = pivot_index - 1
+        
+        def _partition(left: int, right: int, pivot_index) -> int:
+            pivot_val = count_to_num[pivot_index][0]
+            count_to_num[pivot_index], count_to_num[right] = count_to_num[right], count_to_num[pivot_index]
+            partition_index = left
+
+            for i in range(left, right):
+                if count_to_num[i][0] < pivot_val:
+                    count_to_num[partition_index], count_to_num[i] = count_to_num[i], count_to_num[partition_index]
+                    partition_index += 1
+            
+            count_to_num[partition_index], count_to_num[right] = count_to_num[right], count_to_num[partition_index]
+            return partition_index
+        
+        _quick_select(0, len(count_to_num) - 1, len(count_to_num) - k)
+        
+        result = []
+        for i in range(len(count_to_num) - k, len(count_to_num)):
+            result.append(count_to_num[i][1])
+        return result
+```
+
+左に大きい数を集める方法もあるのか。
+その方法のほうが最後結果を返す時に前からk個取得すれば良いので分かりやすい。
+実装してみる。
+
+```python
+from collections import Counter
+import random
+
+class Solution:
+    def topKFrequent(self, nums: List[int], k: int) -> List[int]:
+        num_to_count = [(num, count) for num, count in Counter(nums).items()]
+
+        def _quick_select(left: int, right: int, k_largest_index: int):
+            if left == right:
+                return
+            
+            while left < right:
+                pivot_index = random.randint(left, right)
+                pivot_index = _partition(left, right, pivot_index)
+                if pivot_index == k_largest_index:
+                    break
+                elif pivot_index < k_largest_index:
+                    left = pivot_index + 1
+                else:
+                    right = pivot_index - 1
+        
+        def _partition(left: int, right: int, pivot_index: int) -> int:
+            pivot_val = num_to_count[pivot_index]
+            num_to_count[pivot_index], num_to_count[right] = num_to_count[right], num_to_count[pivot_index]
+            partition_index = left
+
+            for i in range(left, right):
+                if pivot_val[1] < num_to_count[i][1]:
+                    num_to_count[partition_index], num_to_count[i] = num_to_count[i], num_to_count[partition_index]
+                    partition_index += 1
+
+            num_to_count[partition_index], num_to_count[right] = num_to_count[right], num_to_count[partition_index]
+            return partition_index 
+
+        _quick_select(0, len(num_to_count) - 1, k - 1)
+        return [num_to_count[i][0] for i in range(k)]
+```
+
+よく考えたらtupleだとわかりづらいのでdictに変更
+```python
+from collections import Counter
+import random
+
+class Solution:
+    def topKFrequent(self, nums: List[int], k: int) -> List[int]:
+        num_count = [{"num": num, "count": count} for num, count in Counter(nums).items()]
+
+        def _quick_select(left: int, right: int, k_largest_index: int):
+            if left == right:
+                return
+            
+            while left < right:
+                pivot_index = random.randint(left, right)
+                pivot_index = _partition(left, right, pivot_index)
+                if pivot_index == k_largest_index:
+                    break
+                elif pivot_index < k_largest_index:
+                    left = pivot_index + 1
+                else:
+                    right = pivot_index - 1
+        
+        def _partition(left: int, right: int, pivot_index: int) -> int:
+            pivot_count = num_count[pivot_index]["count"]
+            num_count[pivot_index], num_count[right] = num_count[right], num_count[pivot_index]
+            partition_index = left
+
+            for i in range(left, right):
+                if pivot_count < num_count[i]["count"]:
+                    num_count[partition_index], num_count[i] = num_count[i], num_count[partition_index]
+                    partition_index += 1
+
+            num_count[partition_index], num_count[right] = num_count[right], num_count[partition_index]
+            return partition_index 
+
+        _quick_select(0, len(num_count) - 1, k - 1)
+        return [num_count[i]["num"] for i in range(k)]
+```
