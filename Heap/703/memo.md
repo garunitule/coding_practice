@@ -256,3 +256,85 @@ class KthLargest:
 # obj = KthLargest(k, nums)
 # param_1 = obj.add(val)
 ```
+
+## レビューコメントを反映したコード2
+### QuickSelect
+#### アルゴリズムを調査
+いただいたレビューコメント
+https://github.com/garunitule/coding_practice/pull/8/files#r2072361537
+
+#### 実装
+クイックセレクトを利用するなら、nをもともとのnumsの長さ、mをadd回数とすれば、
+- numsにadd: O(1)
+- numsからk番目に大きい数をクイックセレクトによって取得：O(n + m)
+
+なお、addを利用してヒープを初期化した場合、add1回あたりの時間計算量はO(logk)。
+
+https://github.com/hayashi-ay/leetcode/pull/11/files
+https://github.com/ichika0615/arai60/pull/7#discussion_r1874546511
+
+メソッドは
+- _quick_select：left, rightを変えながらpatitionを繰り返し、ある指定された順位の数を取得する
+- _partition：pivotより小さい領域とpivot以上の領域にわけ、pivotのindexを返す
+の2つに分けて実装する。
+
+TLEするがクイックセレクトで動くコードを実装してみた。
+今回の問題のケースで使うかどうかはさておき、「k番目の要素を取得する」という実現したいことを見たときに選択肢の一つとして浮かぶべきだったし実装出来ないのはまずいので勉強もかねて実装した。
+
+```python
+import random
+
+class KthLargest:
+
+    def __init__(self, k: int, nums: List[int]):
+        self.k = k
+        self.nums = nums
+
+    def add(self, val: int) -> int:
+        self.nums.append(val)
+        return self._quick_select(0, len(self.nums) - 1, len(self.nums) - self.k)
+
+    def _quick_select(self, left: int, right: int, k_smallest_idx: int) -> int:
+        if left == right:
+            return self.nums[left]
+        
+        while left < right:
+            pivot_idx = random.randint(left, right)
+            pivot_idx = self._partition(left, right, pivot_idx)
+
+            if pivot_idx == k_smallest_idx:
+                return self.nums[pivot_idx]
+            elif pivot_idx < k_smallest_idx:
+                left = pivot_idx + 1
+            else:
+                right = pivot_idx - 1
+        
+        return self.nums[left]
+
+    def _partition(self, left: int, right: int, pivot_idx: int) -> int:
+        pivot_val = self.nums[pivot_idx]
+        self.nums[pivot_idx], self.nums[right] = self.nums[right], self.nums[pivot_idx]
+        partition_idx = left
+
+        for i in range(left, right):
+            if self.nums[i] < pivot_val:
+                self.nums[partition_idx], self.nums[i] = self.nums[i], self.nums[partition_idx]
+                partition_idx += 1
+        
+        self.nums[partition_idx], self.nums[right] = self.nums[right], self.nums[partition_idx]
+        return partition_idx
+
+
+# Your KthLargest object will be instantiated and called as such:
+# obj = KthLargest(k, nums)
+# param_1 = obj.add(val)
+```
+
+
+### ソートされた状態での追加・削除を調査
+#### アルゴリズムを調査
+いただいたレビューコメント
+https://github.com/garunitule/coding_practice/pull/8/files#r2072361948
+
+#### 実装
+TODO
