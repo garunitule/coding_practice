@@ -99,7 +99,7 @@ https://discordapp.com/channels/1084280443945353267/1201211204547383386/12065159
 
   https://github.com/SuperHotDogCat/coding-interview/pull/44/files
   最初にnums1の各要素ととnums2[0]のペアを作る方法。
-  個人的には「(nums1[i], nums2[j])に増える候補は(nums1[i + 1], nums2[j]), (nums1[i], nums2[j + 1])の2つ」という考え方が肝だと思っているので、そっちの方が良いかなと思った。
+  個人的には「(nums1[i], nums2[j])に増える候補は(nums1[i + 1], nums2[j]), (nums1[i], nums2[j + 1])の2つ」という考え方が肝だと思っているので、(i + 1, j), (i, j + 1)を順番に作っていく方法のほうが良いと思った。
 
   https://github.com/SuperHotDogCat/coding-interview/pull/44/files#r1976402009
   (i + 1, j)と(i, j + 1)の追加は似た操作なのでメソッドに切り出す選択肢もある。
