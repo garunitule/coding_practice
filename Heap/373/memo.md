@@ -176,3 +176,63 @@ class Solution:
         
         return result
 ```
+
+## レビューコメントを踏まえて実装
+https://github.com/garunitule/coding_practice/pull/10/files#r2083384458
+
+最初にnums1[:k]とnums2のペアを作ってヒープに入れた場合に、nums2方向の探索のみで済む。
+ヒープでは各nums1の要素に対するnums2とのペアで最小となる場合のみ保持しているイメージ。
+例えば、(i, j)がヒープに入ってる場合に(i, j + 1)は考えなくてよい。(i, j)がポップされた際にヒープに入れて最小値候補にすればよい。
+
+その他修正点
+- i, jという変数をi1, i2に修正
+- resultをk_smallest_pairsに修正
+- min_heapをmin_candidate_heapに修正（最小値候補を格納するヒープという意味で）
+
+```python
+import heapq
+
+
+class Solution:
+    def kSmallestPairs(self, nums1: List[int], nums2: List[int], k: int) -> List[List[int]]:
+        min_candidate_heap = []
+        for i1 in range(min(len(nums1), k)):
+            heapq.heappush(min_candidate_heap, (nums1[i1] + nums2[0], i1, 0))
+        
+        k_smallest_pairs = []
+        while len(k_smallest_pairs) < k and min_candidate_heap:
+            _, i1, i2 = heapq.heappop(min_candidate_heap)
+            k_smallest_pairs.append((nums1[i1], nums2[i2]))
+
+            if i2 + 1 < min(len(nums2), k):
+                heapq.heappush(min_candidate_heap, (nums1[i1] + nums2[i2 + 1], i1, i2 + 1))
+        
+        return k_smallest_pairs
+```
+
+### 計算量の比較
+n1 = len(nums1)
+n2 = len(nums1)
+k <= n1 * n2
+とする。
+
+#### BFS的なアプローチ
+時間計算量：O(klogk)
+（最初はmin_heapの要素数は1でだんだん増える、最悪k）
+空間計算量：
+- min_heap：O(k)
+- visited：O(k)
+- result：O(k)
+
+
+#### 最初にnums1[:k], nums2[0]のペアをヒープに用意するアプローチ
+時間計算量
+- 最初のペアの用意：O(min(n1, k) * log(min(n1, k)))
+- k_smallest_pairsの構築：O(k * log(min(n1, k)))
+よって、
+- min(n1, k) = n1の場合、O((n1 + k) * log(n1))
+- min(n1, k) = kの場合、O(klogk)
+
+空間計算量
+- min_candidate_heap: O(min(n1, k))
+- k_smallest_pairs：O(k)
