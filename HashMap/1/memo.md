@@ -276,3 +276,29 @@ class Solution:
         
         return []
 ```
+
+## レビューコメントを踏まえて修正
+https://github.com/garunitule/coding_practice/pull/11/files#r2085441677
+step2, 3の実装の場合、defaultdictは不要。存在しないキーへのアクセスを想定しているように見えるのでむしろ混乱の元となる。
+
+```python
+class Solution:
+    def twoSum(self, nums: List[int], target: int) -> List[int]:
+        """
+        numsの要素のうち、和がtargetとなるペアを一つ返す
+
+        なお、numsの要素数が2未満または和がtargetとなるペアが存在しない場合は [] を返す
+        """
+
+        if len(nums) < 2:
+            return []
+        
+        num_to_index = {}
+        for i, num in enumerate(nums):
+            complement = target - num
+            if complement in num_to_index:
+                return [i, num_to_index[complement]]
+            num_to_index[num] = i
+        
+        return []
+```
