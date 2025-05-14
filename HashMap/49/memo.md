@@ -111,11 +111,69 @@ https://github.com/kazukiii/leetcode/pull/13/files
 frozenset使ってる人いた。
 アルファベットをインデックスにする手法と合わせてだけど
 
+countで管理する方法を選択した
+```python
+from collections import defaultdict
+
+
+class Solution:
+    def groupAnagrams(self, strs: List[str]) -> List[List[str]]:
+        anagram_group_to_words = defaultdict(list)
+        for s in strs:
+            alphabet_count = [0] * 26
+            for c in s:
+                alphabet_count[ord(c) - ord("a")] += 1
+            anagram_group_to_words[tuple(alphabet_count)].append(s)
+        return list(anagram_group_to_words.values())
+```
+
 # step3: 15分
 ※間違えがあればn回目を増やす
 
 ## 1回目
+```python
+from collections import defaultdict
+
+
+class Solution:
+    def groupAnagrams(self, strs: List[str]) -> List[List[str]]:
+        anagram_group_to_words = defaultdict(list)
+        for s in strs:
+            alphabet_count = [0] * 26
+            for c in s:
+                alphabet_count[ord(c) - ord("a")] += 1
+            anagram_group_to_words[tuple(alphabet_count)].append(s)
+        return list(anagram_group_to_words.values())
+```
 
 ## 2回目
+```python
+from collections import defaultdict
+
+
+class Solution:
+    def groupAnagrams(self, strs: List[str]) -> List[List[str]]:
+        anagram_group_to_words = defaultdict(list)
+        for s in strs:
+            alphabet_count = [0] * 26
+            for c in s:
+                alphabet_count[ord(c) - ord("a")] += 1
+            anagram_group_to_words[tuple(alphabet_count)].append(s)
+        return list(anagram_group_to_words.values())
+```
 
 ## 3回目
+```python
+from collections import defaultdict
+
+
+class Solution:
+    def groupAnagrams(self, strs: List[str]) -> List[List[str]]:
+        anagram_group_to_words = defaultdict(list)
+        for s in strs:
+            alphabet_count = [0] * 26
+            for c in s:
+                alphabet_count[ord(c) - ord("a")] += 1
+            anagram_group_to_words[tuple(alphabet_count)].append(s)
+        return list(anagram_group_to_words.values())
+```
