@@ -104,12 +104,207 @@ https://github.com/Mike0121/LeetCode/pull/30/files#r1641596790
 leetcodeに載っていたtwo-pointerについてのコメント。
 やはりソートアルゴリズムちゃんと復習しておこう
 
+## 想定質問の例
+https://github.com/katataku/leetcode/pull/12#discussion_r1893968021
+
+以下、計算量を見積もる時、
+m: nums1の長さ
+n: nums2の長さ
+とする
+
+1. 片方がとても大きくて片方がとても小さい場合
+この場合小さい方をSetに変s換して、大きい方をloopしてSetに存在するかどうか確認すればよい。
+こうすると、時間計算量はO(m+n), 空間計算量はO(min(m, n))になる
+
+```python
+class Solution:
+    def intersection(self, nums1: List[int], nums2: List[int]) -> List[int]:
+        if len(nums1) < len(nums2):
+            short_nums = nums1
+            long_nums = nums2
+        else:
+            short_nums = nums2
+            long_nums = nums1
+        
+        short_nums_set = set(short_nums)
+        result = []
+        for num in long_nums:
+            if num in short_nums_set:
+                result.append(num)
+                short_nums_set.discard(num)
+        
+        return result
+
+```
+
+2. 片方がとても大きくてかつソート済み、もう片方がとても小さい場合
+
+この場合は小さい方をloopし、二分探索で大きい方に存在するかどうか確認すればいい。
+時間計算量はO(min(m, n) * log(max(m, n)))になり、空間計算量はO(1)（計算のために確保する変数はleft, rightくらいのため）
+
+```python
+class Solution:
+    def intersection(self, nums1: List[int], nums2: List[int]) -> List[int]:
+        # 大きい方がソート済みという状況を準備する
+        if len(nums1) < len(nums2):
+            short_nums = nums1
+            long_nums = nums2
+        else:
+            short_nums = nums2
+            long_nums = nums1
+        long_nums = sorted(long_nums)
+        result = []
+        for num in short_nums:
+            left = 0
+            right = len(long_nums) - 1
+            while left <= right:
+                mid = (left + right) // 2
+                if long_nums[mid] == num:
+                    result.append(num)
+                    break
+                elif long_nums[mid] < num:
+                    left = mid + 1
+                else:
+                    right = mid - 1
+        return list(set(result))
+```
+
+最後にsetでユニークにしている部分が直感的じゃないので、resultにnumが存在したらスキップするように修正した。resultがListのままだと存在チェックでO(n)かかるのでresultをSetに変更した.
+
+```python
+class Solution:
+    def intersection(self, nums1: List[int], nums2: List[int]) -> List[int]:
+        # 大きい方がソート済みという状況を準備する
+        if len(nums1) < len(nums2):
+            short_nums = nums1
+            long_nums = nums2
+        else:
+            short_nums = nums2
+            long_nums = nums1
+        long_nums = sorted(long_nums)
+        result = set()
+        for num in short_nums:
+            if num in result:
+                continue 
+            left = 0
+            right = len(long_nums) - 1
+            while left <= right:
+                mid = (left + right) // 2
+                if long_nums[mid] == num:
+                    result.add(num)
+                    break
+                elif long_nums[mid] < num:
+                    left = mid + 1
+                else:
+                    right = mid - 1
+        return list(result)
+```
+
+
+3. 両方ともとても大きくてソート済みの場合
+マージソートのマージ処理のように書く
+i1, i2いずれかが末尾の次を指すインデックスになった時点で止めていい
+例えば、i1 == len(nums)になったが、i2 < len(nums2)だったとする
+このときこれ以上resultに追加する候補はnums2には存在しない
+理由は残りのnums2の要素ははnums1のどの要素よりも大きいため
+これはnums1とnums2を逆にしても成立する
+以上のことから`i1 < len(nums1) and i2 < len(nums2)`の間だけ処理を続ければよい
+
+```python
+class Solution:
+    def intersection(self, nums1: List[int], nums2: List[int]) -> List[int]:
+        # 両方がソート済みという状況を作る
+        nums1 = sorted(nums1)
+        nums2 = sorted(nums2)
+
+        # マージソートのマージ処理のように書く
+        i1 = 0
+        i2 = 0
+        result = []
+        while i1 < len(nums1) and i2 < len(nums2):
+            if nums1[i1] < nums2[i2]:
+                i1 += 1
+                continue
+            if nums2[i2] < nums1[i1]:
+                i2 += 1
+                continue
+            result.append(nums1[i1])
+            val = nums1[i1]
+            while i1 < len(nums1) and nums1[i1] == val:
+                i1 += 1
+            while i2 < len(nums2) and nums2[i2] == val:
+                i2 += 1
+        return result
+```
+
 
 # step3: 15分
 ※間違えがあればn回目を増やす
+小さい方のみをSetにして空間計算量はO(min(m, n))に落とす方法で実装する
 
 ## 1回目
+```python
+class Solution:
+    def intersection(self, nums1: List[int], nums2: List[int]) -> List[int]:
+        if len(nums1) < len(nums2):
+            short_nums = nums1
+            long_nums = nums2
+        else:
+            short_nums = nums2
+            long_nums = nums1
+        
+        unique_short_nums = set(short_nums)
+        seen = set()
+        result = []
+        for num in long_nums:
+            if num in seen:
+                continue
+            if num in unique_short_nums:
+                result.append(num)
+                seen.add(num)
+        return result
+```
 
 ## 2回目
+```python
+class Solution:
+    def intersection(self, nums1: List[int], nums2: List[int]) -> List[int]:
+        if len(nums1) < len(nums2):
+            short_nums = nums1
+            long_nums = nums2
+        else:
+            short_nums = nums2
+            long_nums = nums1
+        short_nums_set = set(short_nums)
+        seen = set()
+        result = []
+        for num in long_nums:
+            if num in seen:
+                continue
+            if num in short_nums_set:
+                result.append(num)
+                seen.add(num)
+        return result
+```
 
 ## 3回目
+```python
+class Solution:
+    def intersection(self, nums1: List[int], nums2: List[int]) -> List[int]:
+        if len(nums1) < len(nums2):
+            short_nums = nums1
+            long_nums = nums2
+        else:
+            short_nums = nums2
+            long_nums = nums1
+        short_nums_set = set(short_nums)
+        result = []
+        seen = set()
+        for num in long_nums:
+            if num in seen:
+                continue
+            if num in short_nums_set:
+                result.append(num)
+                seen.add(num)
+        return result
+```
