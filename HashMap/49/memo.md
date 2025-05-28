@@ -177,3 +177,29 @@ class Solution:
             anagram_group_to_words[tuple(alphabet_count)].append(s)
         return list(anagram_group_to_words.values())
 ```
+
+# レビューコメントを踏まえて修正
+アルファベット小文字以外が入力されたときにどうするか
+下記が考えられそう
+- エラーを投げる
+- スキップする
+用途によるが「アルファベット小文字以外が入ること」によりシステムを止めるべきなのか、止めるほどではないのかで対応が変わると思う
+
+下記はスキップした場合のコード
+```python
+from string import ascii_lowercase
+
+
+class Solution:
+    def groupAnagrams(self, strs: List[str]) -> List[List[str]]:
+        anagram_group_to_words = defaultdict(list)
+        for s in strs:
+            alphabet_count = [0] * len(ascii_lowercase)
+            for c in s:
+                code_point_diff = ord(c) - ord("a") 
+                if not (0 <= code_point_diff <= len(ascii_lowercase)):
+                    continue
+                alphabet_count[code_point_diff] += 1
+            anagram_group_to_words[tuple(alphabet_count)].append(s)
+        return list(anagram_group_to_words.values())
+```
