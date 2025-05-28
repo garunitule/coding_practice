@@ -197,7 +197,7 @@ class Solution:
             alphabet_count = [0] * len(ascii_lowercase)
             for c in s:
                 code_point_diff = ord(c) - ord("a") 
-                if not (0 <= code_point_diff <= len(ascii_lowercase)):
+                if not (0 <= code_point_diff < len(ascii_lowercase)):
                     continue
                 alphabet_count[code_point_diff] += 1
             anagram_group_to_words[tuple(alphabet_count)].append(s)
