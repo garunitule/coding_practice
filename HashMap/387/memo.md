@@ -163,3 +163,83 @@ class Solution {
     }
 }
 ```
+
+### PythonでLinkedHashMapを実装してみる
+```python
+class Solution:
+    def firstUniqChar(self, s: str) -> int:
+        class Node:
+            def __init__(self, key: Optional[str] = None, val: Optional[int] = None, prev: Self | None = None, next: Self | None = None):
+                self.key = key
+                self.val = val
+                self.prev = prev
+                self.next = next
+            
+        class LinkedHashMap:
+            def __init__(self):
+                self.head = Node()
+                self.tail = Node(prev=self.head)
+                self.head.next = self.tail
+                self.map = {}
+
+            def put(self, key: str, val: int):
+                new_node = Node(key=key, val=val)
+                if key in self.map:
+                    old_node = self.map[key]
+                    old_node_prev = old_node.prev
+                    old_node_next = next_node.next
+
+                    # before: old_node_prev <-> old_node <-> old_node_next
+                    # after: old_node_prev <-> new_node <-> old_node_next
+                    new_node.prev = old_node_prev
+                    new_node.next = old_node_next
+                    old_node_prev.next = new_node
+                    old_node_next.prev = new_node
+                else:
+                    tail_prev = self.tail.prev
+
+                    # before: tail_prev <-> self.tail
+                    # after: tail_prev <-> new_node <-> self.tail
+                    tail_prev.next = new_node
+                    new_node.prev = tail_prev
+                    new_node.next = self.tail
+                    self.tail.prev = new_node
+
+                self.map[key] = new_node
+            
+            def isEmpty(self):
+                return self.head.next == self.tail and not self.map
+
+            def remove(self, key):
+                if key not in self.map:
+                    return
+
+                remove_node = self.map[key]
+                remove_node_prev = remove_node.prev
+                remove_node_next = remove_node.next
+
+                # before: remove_node_prev <-> remove_node <-> remove_node_next
+                # after: remove_node_prev <-> remove_node_next
+                remove_node_prev.next = remove_node_next
+                remove_node_next.prev = remove_node_prev
+                
+                del self.map[key]
+
+            def getFirstInsertedNode(self):
+                return self.head.next
+                                
+        unique_char_to_index = LinkedHashMap()
+        duplicate_chars = set()
+        
+        for i, c in enumerate(s):
+            if c in duplicate_chars:
+                unique_char_to_index.remove(c)
+                continue
+            unique_char_to_index.put(c, i)
+            duplicate_chars.add(c)
+        
+        if unique_char_to_index.isEmpty():
+            return -1
+        return unique_char_to_index.getFirstInsertedNode().val
+            
+```
