@@ -138,3 +138,28 @@ class Solution:
         first_unique_char_index = next(iter(unique_char_to_index))
         return unique_char_to_index[first_unique_char_index]
 ```
+
+## レビューコメントを踏まえた実装
+### JavaのLinkedHashMapを使って実装してみる
+```java
+class Solution {
+    public int firstUniqChar(String s) {
+        LinkedHashMap<Character, Integer> uniqueCharToIndex = new LinkedHashMap<>();
+        Set<Character> duplicateChars = new HashSet<>();
+
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (duplicateChars.contains(c)) {
+                uniqueCharToIndex.remove(c);
+                continue;
+            }
+            uniqueCharToIndex.put(c, i);
+            duplicateChars.add(c);
+        }
+        if (uniqueCharToIndex.isEmpty()) {
+            return -1;
+        }
+        return uniqueCharToIndex.entrySet().iterator().next().getValue();
+    }
+}
+```
