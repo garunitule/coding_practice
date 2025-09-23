@@ -85,7 +85,7 @@ https://github.com/ryosuketc/leetcode_arai60/pull/43/files
 total_waysという変数で保持している
 
 # step3: 15分
-※間違えがあればn回目を増やす
+今回問題の特性上、保持するのは直前の2つだけでいいので、2つだけ保持する実装を選択した
 
 ## 1回目
 ```python
