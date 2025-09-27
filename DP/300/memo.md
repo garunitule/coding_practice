@@ -122,14 +122,116 @@ https://github.com/tokuhirat/LeetCode/pull/31/files#r2128692081
 
 https://github.com/ryosuketc/leetcode_arai60/pull/44/files
 DPの場合のlongest_subsequence_lengthsは分かりやすい
-2分探索を使った時の変数名insert_indexも分かりやすい
 
 
 # step3: 15分
 ※間違えがあればn回目を増やす
 
-## 1回目
+動的計画法も貪欲法 + 2分探索もやる
+個人的には動的計画法のほうが分かりやすい
+貪欲法だと最後にlen(lis_tails)を返しているのが、ぱっと見で分かりづらいと思う（コード読んで意図把握できるならいいが、それに頼るのも良くないと思う）
 
-## 2回目
+## 動的計画法
+### 1回目
+```python
+class Solution:
+    def lengthOfLIS(self, nums: List[int]) -> int:
+        n = len(nums)
+        longest_subsequence_lengths = [1] * n
+        for i in range(n):
+            for j in range(i):
+                if nums[j] < nums[i]:
+                    longest_subsequence_lengths[i] = max(longest_subsequence_lengths[i], longest_subsequence_lengths[j] + 1)
+    
+        return max(longest_subsequence_lengths)
+```
 
-## 3回目
+### 2回目
+```python
+class Solution:
+    def lengthOfLIS(self, nums: List[int]) -> int:
+        n = len(nums)
+        longest_subsequence_lengths = [1] * n
+        for i in range(n):
+            for j in range(i):
+                if nums[j] < nums[i]:
+                    longest_subsequence_lengths[i] = max(longest_subsequence_lengths[i], longest_subsequence_lengths[j] + 1)
+        
+        return max(longest_subsequence_lengths)
+```
+
+### 3回目
+```python
+class Solution:
+    def lengthOfLIS(self, nums: List[int]) -> int:
+        n = len(nums)
+        longest_subsequence_lengths = [1] * n
+        for i in range(n):
+            for j in range(i):
+                if nums[j] < nums[i]:
+                    longest_subsequence_lengths[i] = max(longest_subsequence_lengths[i], longest_subsequence_lengths[j] + 1)
+
+        return max(longest_subsequence_lengths)
+```
+
+## 貪欲法 + 2分探索
+### 1回目
+```python
+from bisect import bisect_left
+
+
+class Solution:
+    def lengthOfLIS(self, nums: List[int]) -> int:
+        lis_tails = [nums[0]]
+        for i in range(1, len(nums)):
+            lower_bound_index = bisect_left(lis_tails, nums[i])
+            if lower_bound_index == len(lis_tails):
+                lis_tails.append(nums[i])
+                continue
+            lis_tails[lower_bound_index] = nums[i]
+
+        return len(lis_tails)
+```
+
+
+### 2回目
+```python
+from bisect import bisect_left
+
+
+class Solution:
+    def lengthOfLIS(self, nums: List[int]) -> int:
+        if not nums:
+            return 0
+        
+        lis_tails = [nums[0]]
+        for i in range(1, len(nums)):
+            lower_bound_index = bisect_left(lis_tails, nums[i])
+            if lower_bound_index == len(lis_tails):
+                lis_tails.append(nums[i])
+                continue
+            lis_tails[lower_bound_index] = nums[i] 
+
+        return len(lis_tails)
+```
+
+### 3回目
+```python
+from bisect import bisect_left
+
+
+class Solution:
+    def lengthOfLIS(self, nums: List[int]) -> int:
+        if not nums:
+            return 0
+        
+        lis_tails = [nums[0]]
+        for i in range(1, len(nums)):
+            lower_bound_index = bisect_left(lis_tails, nums[i])
+            if lower_bound_index == len(lis_tails):
+                lis_tails.append(nums[i])
+                continue
+            lis_tails[lower_bound_index] = nums[i]
+        
+        return len(lis_tails)
+```
