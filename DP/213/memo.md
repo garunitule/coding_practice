@@ -62,6 +62,15 @@ House Robberと同じように前2つだけ保持すれば良いのだが、変�
 
 # step2: 30分
 ## 他の人のPRやコメントを踏まえて実装
+leetcodeの回答を見た
+最初の家を強盗した場合としなかった場合で分割するという大枠は一緒
+だが、numsを分割しそれ以外は両者をHouse Robberの解法で解いている
+- nums[:-1]
+- nums[1:]
+
+https://github.com/shintaro1993/arai60/pull/40/files
+読みやすい
+
 
 # step3: 15分
 ※間違えがあればn回目を増やす
