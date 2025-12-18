@@ -118,3 +118,117 @@ class Solution:
 
         return left
 ```
+
+# レビューをうけて
+https://github.com/garunitule/coding_practice/pull/41#discussion_r2625314920
+>二分探索については、ループ不変条件のバリエーション、それぞれの不変条件設定から両端点の初期化、更新式、ループ継続条件などの導出、二分探索の正当性を説明できるところまでがSWEの常識に含まれると思います。
+
+自分の理解の確認を兼ねて言語化と実装をやってみた。
+
+## 値を探す時
+重複を考慮せず、値を見つけたら返す時
+- 不変条件
+  - leftより左はtargetより小さい
+  - rightより右はtargetより大きい
+- 変数の意味
+  - left: targetでありうる最小の位置
+  - tight: targetでありうつ最大の位置
+- 初期値
+  - left: 0
+  - right: len(nums) - 1
+    - len(nums)でもいいが、len(nums)に要素はないのでlen(nums) - 1で充分
+- 更新方法
+  - nums[mid] < targetならば、left= mid + 1
+    - mid以前がtargetより小さいなら、不変条件よりleft = mid + 1に更新できる
+  - nums[mid] > targetならば、right = mid - 1
+    - leftと同様に不変条件から
+- 終了条件
+  - nums[mid] == targetならmidを返す
+  - left > rightのとき、left以上right以下が候補のはずなので、left > rightになったら候補が空になったといえる。終了時はright = left - 1になっている。不変条件から、rightはnums[i]がtargetより小さい中で最大のインデックス、leftはnums[i]がtargeより大きい中で最小のインデックスなので、leftを返すべき。
+
+```python
+class Solution:
+    def searchInsert(self, nums: List[int], target: int) -> int:
+        left = 0
+        right = len(nums) - 1
+        while left <= right:
+            mid = (left + right) // 2
+            if nums[mid] == target:
+                return mid
+            if nums[mid] < target:
+                left = mid + 1
+            else:
+                right = mid - 1
+        
+        return left
+```
+
+## bisect_right
+例えば、[10, 11, 11, 11, 12]があって11を挿入できる位置を探す際に4を返す.
+- 不変条件
+  - leftより左はtarget以下
+  - right以降はtargetより大きい
+- 変数の意味
+  - left: あり得る挿入位置の最小値
+  - right: あり得る挿入位置の最大値
+- 初期値
+  - left: 0
+  - right: len(nums)
+    - 挿入位置の候補の最大値なので、len(nums) - 1にするとややこしい。例外的な扱いが必要になる。
+- 更新方法（不変条件を維持しながら絞る）
+  - nums[mid] <= targetならばleft = mid + 1
+    - mid以前のnumsがtarget以下なので、mid + 1に更新できる
+  - nums[mid] > targetならばright = mid
+    - nums[mid - 1]はtarget以下の可能性があるので、midまでしか移動できない
+- 終了条件
+  - 不変条件より、left == rightが終了条件になる。継続条件はleft < right
+
+実装してみた。今回の問題だと通らないケースもあるが、想定通り。
+left, rightで実装されるコードを見るけど、left,rightだと役割を誤認する可能性があるので明確に記載してみた。
+```python
+class Solution:
+    def searchInsert(self, nums: List[int], target: int) -> int:
+        min_insertable_index = 0
+        max_insertable_index = len(nums)
+        while min_insertable_index < max_insertable_index:
+            mid = (min_insertable_index + max_insertable_index) // 2
+            if nums[mid] <= target:
+                min_insertable_index = mid + 1
+            else:
+                max_insertable_index = mid
+
+        return min_insertable_index
+```
+
+## bisect_left
+例えば、[10, 11, 11, 11, 12]があって11を挿入できる位置を探す際に1を返す。
+- 不変条件
+  - leftより左はtargetより小さい
+  - right以降はtarget以上
+-  変数の意味
+  - left: あり得る挿入位置の最小値
+    right: あり得る挿入位置の最大値
+- 初期値
+  - left: 0
+  - right: len(nums)
+    - 挿入位置の候補の最大値なので、len(nums) - 1にするとややこしい。例外的な扱いが必要になる。
+- 更新方法（不変条件を維持しながら絞る）
+  - nums[mid] < targetならば、left = mid + 1
+  - nums[mid] >= targetならば、right = mid
+- 終了条件
+  - left == rightが終了条件になる
+
+```python
+class Solution:
+    def searchInsert(self, nums: List[int], target: int) -> int:
+        min_insertable_index = 0
+        max_insertable_index = len(nums)
+        while min_insertable_index < max_insertable_index:
+            mid = (min_insertable_index + max_insertable_index) // 2
+            if nums[mid] < target:
+                min_insertable_index = mid + 1
+            else:
+                max_insertable_index = mid
+
+        return min_insertable_index
+```
