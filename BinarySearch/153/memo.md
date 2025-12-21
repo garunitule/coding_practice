@@ -136,3 +136,43 @@ class Solution:
         
         return nums[right]
 ```
+
+# レビューコメント
+https://github.com/garunitule/coding_practice/pull/42#discussion_r2633207600
+>nums[-1]と比較すると、
+>        if nums[0] <= nums[-1]:
+>            return nums[0]
+>の2行を書かずに済みます。
+
+なるほど、nums[-1]と比較する場合は不変条件が、
+- left以前のiについて、nums[i] > nums[-1]
+- right以降のiについて、nums[i] <= nums[-1]
+になる。
+
+このときleft, rightの役割と初期値は下記になる。
+- left
+  - 役割：nums[-1]より大きいと確定しているインデックス
+  - 初期値：-1。nums[-1]より大きいと確定確定している左側の領域はないから、0の外側である-1にしている。
+- right:
+  - 役割：nums[-1]以下と確定しているインデックス 
+  - 初期値：len(nums) - 1。numsの一番最後の要素であるlen(nums) - 1ではnums[-1]以下であることが確定しているため。それより前は分からない。
+になる。
+
+
+```python
+class Solution:
+    def findMin(self, nums: list[int]) -> int:
+        """invariant:
+        - for all i <= left, nums[i] > nums[-1]
+        - for all i >= right, nums[i] <= nums[-1]
+        """
+        left = -1
+        right = len(nums) - 1
+        while right - left > 1:
+            mid = (left + right) // 2
+            if nums[mid] > nums[-1]:
+                left = mid
+            else:
+                right = mid
+        return nums[right]
+```
