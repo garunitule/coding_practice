@@ -87,7 +87,8 @@ class Solution:
         return max_length
 ```
 
-各ループ終了時でstart ~ endの間で文字が重複してない状態を維持している。
+各ループで、endに対して重複しない最小のstartを保持している。
+start = max(start, char_to_next_index[s[end]])である理由は、startより左は何かしら重複があって捨てた領域のためと理解しているが、何となく腑に落ちていない。2分探索の不変条件ほどしっくりきていない感覚。
 
 ```python
 class Solution:
