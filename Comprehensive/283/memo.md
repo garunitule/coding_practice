@@ -61,17 +61,147 @@ class Solution:
 もっと良い解法があるかもしれないが思いつかないので、いったん解法を見てみる。
 
 # step2: 30分
-## 時間の関係でstep1で書けなかった迷いや判断を書く
 
-## 自分でコード読みやすく整えて実装
+別のlistを用意して詰めるだけでよかった。
 
-## 他の人のPRやコメントを踏まえて実装
+```python
+class Solution:
+    def moveZeroes(self, nums: List[int]) -> None:
+        """
+        Do not return anything, modify nums in-place instead.
+        """
+        non_zero_values = [num for num in nums if num != 0]
+        nums[:len(non_zero_values)] = non_zero_values
+        nums[len(non_zero_values):] = [0] * (len(nums) - len(non_zero_values))
+```
+
+別のlistを用意しない方法もあった。
+numsを順番に走査していく。
+非ゼロの要素が登場したらnext_non_zero_indexとスワップし、next_non_zero_indexをインクリメントする方法。
+不変条件
+- next_non_zero_indexより左は全て非ゼロ。
+- next_non_zero_indexからcurrentの前までは全てゼロ。
+current - 1までは作りたい状態になっていて、次のcurrentでもその状態になるように操作する。
+これを繰り返す。
+
+動かないコード。[1]を受け取ったときに[0]を返す。
+
+```python
+class Solution:
+    def moveZeroes(self, nums: List[int]) -> None:
+        """
+        Do not return anything, modify nums in-place instead.
+        """
+
+        next_non_zero_index = 0
+        for i in range(len(nums)):
+            if nums[i] == 0:
+                continue
+            non_zero_value = nums[i]
+            nums[next_non_zero_index] = non_zero_value
+            nums[i] = 0
+            next_non_zero_index += 1
+```
+
+
+不変条件は
+- 0 <= index < first_zero_index: 非ゼロ領域
+- first_zero_index <= index < i: ゼロ領域
+- i <= index: 未調査領域
+と書ける。
+個人的にはswapを使うよりも下記のように考えたほうが分かりやすい。
+- nums[i] == 0のとき：何もしない。ゼロ領域が伸びるだけで不変条件は維持されるので。
+- nums[i] != 0のとき
+  - first_zero_index == 1：非ゼロ領域と未調査領域しかない。現在の要素を未調査領域から非ゼロ領域にすればいいので、first_zero_indexをインクリメントする。
+  - first_zero_index < i: 非ゼロ領域、ゼロ領域、未調査領域がある。現在の要素を非ゼロ領域の末尾に移動し、現在の位置はゼロ領域とする。
+
+
+```python
+class Solution:
+    def moveZeroes(self, nums: List[int]) -> None:
+        """
+        Do not return anything, modify nums in-place instead.
+        不変条件
+        - 0 <= index < first_zero_index: 非ゼロ領域
+        - first_zero_index <= index < i: ゼロ領域
+        - i <= index: 未調査領域
+        """
+
+        first_zero_index = 0
+        for i in range(len(nums)):
+            # 0のときは何もせず進んでも不変条件が守られるため何もしない
+            if nums[i] == 0:
+                continue
+            # ゼロ領域がある場合は、非ゼロ領域を伸ばしてそのあとゼロ領域を後ろにずらす
+            # ゼロ領域がない場合は、非ゼロ領域を伸ばす
+            if first_zero_index < i:
+                nums[first_zero_index] = nums[i]
+                nums[i] = 0
+            first_zero_index += 1
+```
 
 # step3: 15分
 ※間違えがあればn回目を増やす
 
 ## 1回目
+```python
+class Solution:
+    def moveZeroes(self, nums: List[int]) -> None:
+        """
+        Do not return anything, modify nums in-place instead.
+        """
+        first_zero_index = 0
+        for i in range(len(nums)):
+            if nums[i] == 0:
+                continue
+            if first_zero_index < i:
+                nums[first_zero_index] = nums[i]
+                nums[i] = 0
+            first_zero_index += 1
+```
 
 ## 2回目
+```python
+class Solution:
+    def moveZeroes(self, nums: List[int]) -> None:
+        """
+        Do not return anything, modify nums in-place instead.
+        不変条件
+        - 0 <= index < first_zero_index: 非ゼロ領域
+        - first_zero_index <= index < i: ゼロ領域
+        - i <= index: 未調査領域
+        """
+        first_zero_index = 0
+        for i in range(len(nums)):
+            if nums[i] == 0:
+                continue
+            if first_zero_index < i:
+                nums[first_zero_index] = nums[i]
+                nums[i] = 0
+            first_zero_index += 1
+```
 
 ## 3回目
+```python
+class Solution:
+    def moveZeroes(self, nums: List[int]) -> None:
+        """
+        Do not return anything, modify nums in-place instead.
+        """
+        first_zero_index = 0
+        for i in range(len(nums)):
+            if nums[i] == 0:
+                continue
+            if first_zero_index < i:
+                nums[first_zero_index] = nums[i]
+                nums[i] = 0
+            first_zero_index += 1
+```
+
+## step3の後に考えたこと
+first_zero_indexという変数名が分かりづらい。
+もっと不変条件が自然に想起されるような名前にしたい。
+
+https://github.com/mamo3gr/arai60/pull/51/changes
+max_non_zero_index
+非ゼロ領域に関して命名するか、ゼロ領域に関して命名するかの2択と思うと、これ以上はなさそう。
